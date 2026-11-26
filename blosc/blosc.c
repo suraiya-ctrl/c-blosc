@@ -220,8 +220,11 @@ static uint8_t *my_malloc(size_t size)
 #endif  /* _WIN32 */
 
   if (block == NULL || res != 0) {
-    printf("Error allocating memory!");
-    return NULL;
+    /* The callers size their scratch buffers from the compressed header and
+       cannot recover from a NULL here, so bail out instead of returning it.
+       stderr is unbuffered, so the message survives the abort(). */
+    fprintf(stderr, "Error allocating memory!\n");
+    abort();
   }
 
   return (uint8_t *)block;
